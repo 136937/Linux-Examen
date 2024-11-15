@@ -1,0 +1,13 @@
+IP PlAN Go4Stones:
+Device	IP Address	Notes
+Network Address	192.168.0.0	
+Subnet Mask	255.255.255.0	
+Broadcast Address	192.168.0.255	
+
+Router	172.16.0.1	(Default gateway)
+DHCP Server	192.168.0.2	
+DNS Server	192.168.0.3	
+Printer		192.168.0.20
+Gateway	192.168.0.5	
+Clients	192.168.0.20 - 192.168.0.254 Overig
+
