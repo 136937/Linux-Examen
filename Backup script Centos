@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Dit script voert de maandelijkse back-up uit op de server
+
+# Log file locatie
+LOG_FILE="/var/log/maintenance.log"
+
+# Functie om het loggen te vereenvoudigen
+log() {
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" | tee -a $LOG_FILE
+}
+
+log "Starting maintenance tasks"
+
+# Update het systeem
+log "Updating system packages"
+yum update -y >> "$LOG_FILE" 2>&1
+
+# Wis de yum-cache
+log "Clearing yum cache"
+yum clean all >> "$LOG_FILE" 2>&1
+
+# Verwijder oude kernels
+log "Removing old kernels"
+package-cleanup --oldkernels --count=1 >> "$LOG_FILE" 2>&1
+
+# Voer de systeembestandscontrole uit
+log "Running filesystem check"
+fsck -A >> "$LOG_FILE" 2>&1
+
+# Verwijder de logs
+log "Clearing log files"
+> /var/log/messages
+> /var/log/secure
+> /var/log/cron
+> /var/log/maillog
+
+# Leeg de tmp directie
+log "Clearing /tmp directory"
+rm -rf /tmp/*
+
+# Backup het systeem
+log "Creating system backup"
+tar -zcvf /backup/monthly_backup_$(date +%Y-%m-%d).tar.gz / --exclude=/backup >> "$LOG_FILE" 2>&1
+
+# herstart het systeem
+log "Rebooting the system"
+reboot
