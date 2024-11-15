@@ -1,0 +1,22 @@
+aanmaken script bestand:
+nano maintenance.sh
+
+uitvoeren:
+chmod +x maintenance.sh
+
+verplaatsen:
+sudo mv maintenance.sh /usr/local/bin/
+
+Test:
+sudo /usr/local/bin/maintenance.sh
+
+cat /var/log/maintenance.log
+
+Uitvoeren:
+sudo nano /etc/crontab -l
+
+Deze onderaan plaatsen:
+0 2 * * * /usr/local/bin/maintenance.sh
+
+Controleren:
+cat /var/log/maintenance.log
