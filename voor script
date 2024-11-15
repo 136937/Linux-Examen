@@ -16,7 +16,7 @@ Uitvoeren:
 sudo nano /etc/crontab -l
 
 Deze onderaan plaatsen:
-0 2 * * * /usr/local/bin/maintenance.sh
+ 0 19 1-7 * * [ "$(date +\%u)" = "5" ] && /usr/local/bin/maintenance.sh
 
 Controleren:
 cat /var/log/maintenance.log
