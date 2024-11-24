@@ -1,0 +1,127 @@
+cent os 9 stream werkt het beste
+
+bij aanmaken vm 100gb voor installatie
+tijdens instalatie 1 netwerk kaar en na installatie 2e netwerk kaart
+
+engels-united states
+kijk of tijd en datum goed is
+installation destination om schijf te selecteren. Kan kan zijn dat je dit 2 keer moet doen
+bij netwerk & host name moet je schuifje aanzetten en hostname moet solareffect zijn.
+Root wachtwoord doe je Welkom1!
+User creation moet je je volledige naam met gebruikersnaam in kleine letters en make user administrator moet je ook aanvinken. daarna wachtwoord Welkom1!
+Software selection moet je minimal install selecteren.
+dan klik je op done en kun je starten.
+
+
+maak aantekeningen bij installatie
+
+voor dat de server volledig opgestart is moet je server uitzetten
+je moet een extra schijf toevoegen van minimaal 500gb en een extra netwerkkaart met LAN segment solareffect die moet je nog aanmaken.
+dan kun je de server weer aanzetten.
+
+log in met je eigen inlog
+
+ip a 
+start putty op en stel het in
+
+sudo dnf update
+y
+y
+
+sudo yum -y install nano
+
+sudo systemctl enable sshd
+
+sudo firewall-cmd --add-service=ssh --permanent
+
+sudo firewall-cmd --reload     (na aanpassen firewall deze command)
+
+lsblk
+
+sudo cfdisk /dev/nvme0n2
+
+gpt
+
+free space
+
+write 
+
+yes 
+
+enter 
+
+quit
+
+sudo mkfs.ext4 /dev/nvme0n2p1
+
+sudo mkdir /data
+
+sudo blkid
+
+alleen tekst tussen eerste aanhalingsteken
+
+sudo nano /etc/fstab
+
+helemaal naar beneden
+
+uuid= en dan de tekst 
+
+# automount /data voor Nextcloud
+tab toets /data ext4 defaults 0 2 
+
+
+sudo mount -a
+
+sudo systemctl daemon-reload
+
+lsblk
+
+
+* Installatie dhcp *
+
+sudo nmtui
+
+Edit connection
+
+edit 
+profile name
+Internet
+
+wired connection
+wired connection1 weg en vervang je voor dhcp
+ipv4 configuration moet op manual
+voor eigen ip adres in bij addresses
+gategay open laten
+
+dns servers op 8.8.8.8 zetten
+
+never us this network for default route aan vinken
+
+require ipv4 addressing for this connection aan vinken
+
+ipv6 ignore
+
+ok en enter
+
+escape 2x
+
+ip a
+
+sudo dnf install dhcp-server
+y
+
+sudo rm -rf /etc/dhcp/dhcpd.conf
+
+sudo nano /etc/dhcp/dhcpd.conf
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-dhcp-configuring-server
+
+zorg ervoor dat je deze file persoonlijk maakt 
+
+sudo systemctl start dhcpd
+
+sudo firewall-cmd --add-service=dhcp --permanent
+
+sudo firewall-cmd --add-masquerade --permanent
+
+sudo firewall-cmd --reload
