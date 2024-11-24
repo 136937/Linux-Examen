@@ -1,0 +1,169 @@
+
+Je instructies zijn specifiek gericht op CentOS Stream 9, dat werkt met dnf en andere Red Hat-gebaseerde tools. Ubuntu gebruikt echter een andere pakketmanager (apt) en verschilt in configuraties. Hier is een aangepaste versie van je stappenplan voor Ubuntu:
+
+Installatie Ubuntu Server (Minimal)
+Bij aanmaken VM:
+
+Reserveer 100GB opslagruimte.
+Voeg bij installatie één netwerkkaart toe.
+Voeg na installatie een tweede netwerkkaart toe.
+Installatie-instellingen:
+
+Taal: Engels (United States).
+Controleer of tijd en datum correct zijn.
+Bij installation destination selecteer je de schijf (mogelijk moet dit twee keer gedaan worden).
+Bij network & hostname:
+Zet de schuif van netwerk aan.
+Stel de hostname in op solareffect.
+Root-wachtwoord en gebruikersinstellingen:
+
+Root-wachtwoord: Welkom1!.
+Gebruiker:
+Volledige naam invullen.
+Gebruikersnaam in kleine letters.
+Vink make user administrator aan.
+Wachtwoord: Welkom1!.
+Softwareselectie:
+
+Kies voor Minimal Install.
+VM Configuratie na installatie:
+
+Zet de server uit.
+Voeg een extra schijf van 500GB toe.
+Voeg een extra netwerkkaart toe en stel deze in op een nieuw LAN-segment genaamd solareffect.
+Start de server weer.
+Post-installatie Ubuntu
+Updates uitvoeren:
+
+bash
+Code kopiëren
+sudo apt update
+sudo apt upgrade -y
+Nano-editor installeren:
+
+bash
+Code kopiëren
+sudo apt install -y nano
+SSH Configuratie:
+
+bash
+Code kopiëren
+sudo systemctl enable ssh
+sudo ufw allow ssh
+sudo ufw reload
+Extra schijf configureren:
+
+Controleer schijven:
+
+bash
+Code kopiëren
+lsblk
+Partitioneren:
+
+bash
+Code kopiëren
+sudo fdisk /dev/sdb
+Kies g voor GPT.
+Maak een nieuwe partitie (n).
+Gebruik alle vrije ruimte.
+Schrijf de wijzigingen (w).
+Formatteren:
+
+bash
+Code kopiëren
+sudo mkfs.ext4 /dev/sdb1
+Mount-punt maken:
+
+bash
+Code kopiëren
+sudo mkdir /data
+UUID achterhalen:
+
+bash
+Code kopiëren
+sudo blkid
+Fstab aanpassen:
+
+bash
+Code kopiëren
+sudo nano /etc/fstab
+Voeg de volgende regel toe onderaan:
+
+bash
+Code kopiëren
+UUID=<jouw_uuid> /data ext4 defaults 0 2
+Automatisch mounten:
+
+bash
+Code kopiëren
+sudo mount -a
+Controleren of de schijf correct is gemount:
+
+bash
+Code kopiëren
+lsblk
+Installatie DHCP-server (Ubuntu)
+Netwerkconfiguratie aanpassen:
+
+Start de netwerkconfiguratie-tool:
+bash
+Code kopiëren
+sudo nano /etc/netplan/00-installer-config.yaml
+Voeg een statisch IP-adres en configuratie toe:
+yaml
+Code kopiëren
+network:
+  version: 2
+  ethernets:
+    enp0s3:
+      dhcp4: false
+      addresses: [192.168.x.x/24]
+      nameservers:
+        addresses: [8.8.8.8]
+      routes:
+        - to: default
+          via: 192.168.x.x
+Pas de wijzigingen toe:
+bash
+Code kopiëren
+sudo netplan apply
+Controleer netwerk:
+bash
+Code kopiëren
+ip a
+DHCP-server installeren:
+
+bash
+Code kopiëren
+sudo apt install -y isc-dhcp-server
+DHCP-configuratie aanpassen:
+
+Verwijder de oude configuratie:
+bash
+Code kopiëren
+sudo rm -rf /etc/dhcp/dhcpd.conf
+Maak een nieuwe configuratiebestand:
+bash
+Code kopiëren
+sudo nano /etc/dhcp/dhcpd.conf
+Voeg de configuratie toe gebaseerd op je netwerk. Raadpleeg deze handleiding voor details.
+DHCP-server starten en firewall aanpassen:
+
+bash
+Code kopiëren
+sudo systemctl start isc-dhcp-server
+sudo ufw allow 67/udp
+sudo ufw reload
+NAT en Masquerade instellen:
+
+bash
+Code kopiëren
+sudo iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+Permanent maken:
+
+bash
+Code kopiëren
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+sudo netfilter-persistent reload
+Met deze stappen kun je een vergelijkbare setup maken op Ubuntu. Voer de commando's stap voor stap uit en controleer regelmatig of alles naar behoren werkt.
