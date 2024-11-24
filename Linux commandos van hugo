@@ -1,0 +1,80 @@
+-Eigen user sudo permissies geven-
+
+sudo usermod -aG sudo <gebruikersnaam>
+
+groups <gebruikersnaam> (Hiermee kan je zien in welke group je zit)
+
+<gebruikersnaam> : <gebruikersnaam> sudo (Dit zou er moeten staan)
+
+-Het installeren van wordpress inclusief LAMP stack (zonder virtualhost) (Ik heb het niet getest maar beter iets dan niets)
+
+-Installeer de LAMP Stack-
+
+sudo apt update
+sudo apt install apache2 mysql-server php php-mysql libapache2-mod-php
+
+Controleer of apache2 en mysql draaien
+
+sudo systemctl status apache2
+sudo systemctl status mysql
+
+-Installeer wordpress-
+
+cd /tmp
+curl -O https://wordpress.org/latest.tar.gz
+tar -xzvf latest.tar.gz
+
+-Verplaats wordpress naar de webroot apache-
+
+sudo mv /tmp/wordpress/* /var/www/html/
+
+-Verwijder de standaard indexpagina van Apache (indien nodig):-
+
+sudo rm /var/www/html/index.html
+
+-Log in op mysql-
+sudo mysql
+
+-Maak een database gebruiker aan-
+
+CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE USER 'wordpressuser'@'localhost' IDENTIFIED BY 'sterk_wachtwoord';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+-Stel wordpress in-
+-kopieer en bewerk het configuratie bestand-
+
+sudo cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+sudo nano /var/www/html/wp-config.php
+
+-vul de instellingen goed in-
+
+define('DB_NAME', 'wordpress');
+define('DB_USER', 'wordpressuser');
+define('DB_PASSWORD', 'sterk_wachtwoord');
+
+-Stel de juiste bestandsrechten in-
+
+sudo chown -R www-data:www-data /var/www/html/
+sudo chmod -R 755 /var/www/html/
+
+-Configureer Apache voor Gebruik Zonder VirtualHost-
+-De standaard Apache-configuratie verwijst naar /var/www/html. Controleer of .htaccess-bestanden zijn toegestaan en dat mod_rewrite is ingeschakeld:-
+
+sudo nano /etc/apache2/sites-available/000-default.conf
+
+zorg er voor dat dit blok correct is ingesteld:
+<Directory /var/www/html>
+    AllowOverride All
+</Directory>
+
+-Schakel mod rewrite in-
+
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+
+-Voltooi de installatie in de browser-
+Ga naar http://<jouw-server-ip>/ in je browser.
+Volg de WordPress-wizard om de installatie te voltoo
